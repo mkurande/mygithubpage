@@ -1,0 +1,292 @@
+[
+ {
+  "iteration": 0,
+  "note": "iteration 00: first guess from published dimensions only (L 20.55, b 13.28, h 4.24 m, S 83.6 m2, wing LE/TE 40/40 deg, V-tail cant 50 deg). Not yet fitted to imagery.",
+  "mean_iou_fitted": 0.8635297437242887,
+  "iou": {
+   "side": 0.847,
+   "top": 0.882,
+   "top_b": 0.8824,
+   "front": 0.8615
+  },
+  "boundary_mean_cm": {
+   "side": 12.6,
+   "top": 29.9,
+   "top_b": 29.5,
+   "front": 13.6
+  },
+  "boundary_p95_cm": {
+   "side": 43.1,
+   "top": 122.8,
+   "top_b": 120.6,
+   "front": 35.1
+  },
+  "aspect": {
+   "side": 1.0075,
+   "top": 0.9513,
+   "top_b": 0.9513,
+   "front": 1.0
+  }
+ },
+ {
+  "iteration": 1,
+  "note": "iteration 01: structure update (pentagon V-tails, trapezoid intakes narrowing downward, W-shaped aft deck with trough sidewalls, wing through fuselage) and values from back-projected photo measurements (iter_00 cameras), normalised to published L=20.55 m, b=13.28 m.",
+  "mean_iou_fitted": 0.9071971688327642,
+  "iou": {
+   "side": 0.9008,
+   "top": 0.9378,
+   "top_b": 0.9378,
+   "front": 0.883
+  },
+  "boundary_mean_cm": {
+   "side": 8.0,
+   "top": 16.9,
+   "top_b": 16.7,
+   "front": 13.9
+  },
+  "boundary_p95_cm": {
+   "side": 22.4,
+   "top": 101.0,
+   "top_b": 98.1,
+   "front": 48.6
+  },
+  "aspect": {
+   "side": 1.023,
+   "top": 0.9983,
+   "top_b": 1.0068,
+   "front": 1.0
+  }
+ },
+ {
+  "iteration": 2,
+  "note": "iteration 2: pattern-search refinement of iter_01 with iter_01 cameras fixed (objective 0.93901), then cameras re-registered.",
+  "mean_iou_fitted": 0.9465412487556932,
+  "iou": {
+   "side": 0.961,
+   "top": 0.9698,
+   "top_b": 0.9708,
+   "front": 0.9089
+  },
+  "boundary_mean_cm": {
+   "side": 3.1,
+   "top": 5.5,
+   "top_b": 5.1,
+   "front": 12.8
+  },
+  "boundary_p95_cm": {
+   "side": 10.2,
+   "top": 19.7,
+   "top_b": 15.8,
+   "front": 55.1
+  },
+  "aspect": {
+   "side": 1.0119,
+   "top": 0.9962,
+   "top_b": 1.0057,
+   "front": 1.0
+  }
+ },
+ {
+  "iteration": 3,
+  "note": "iteration 3: pattern-search refinement of iter_02 with iter_02 cameras fixed (objective 0.95224), then cameras re-registered.",
+  "mean_iou_fitted": 0.9534908937017831,
+  "iou": {
+   "side": 0.961,
+   "top": 0.9701,
+   "top_b": 0.9725,
+   "front": 0.9293
+  },
+  "boundary_mean_cm": {
+   "side": 3.0,
+   "top": 5.3,
+   "top_b": 4.8,
+   "front": 12.0
+  },
+  "boundary_p95_cm": {
+   "side": 12.8,
+   "top": 19.2,
+   "top_b": 15.8,
+   "front": 60.1
+  },
+  "aspect": {
+   "side": 1.0188,
+   "top": 0.9935,
+   "top_b": 1.0058,
+   "front": 1.0
+  }
+ },
+ {
+  "iteration": 4,
+  "note": "iteration 4: pattern-search refinement of iter_03 with iter_03 cameras fixed (objective 0.95456), then cameras re-registered.",
+  "mean_iou_fitted": 0.9556643221296753,
+  "iou": {
+   "side": 0.9595,
+   "top": 0.9713,
+   "top_b": 0.9736,
+   "front": 0.9362
+  },
+  "boundary_mean_cm": {
+   "side": 3.1,
+   "top": 5.3,
+   "top_b": 4.7,
+   "front": 11.7
+  },
+  "boundary_p95_cm": {
+   "side": 13.6,
+   "top": 19.7,
+   "top_b": 15.8,
+   "front": 60.0
+  },
+  "aspect": {
+   "side": 1.0159,
+   "top": 0.9957,
+   "top_b": 1.0054,
+   "front": 1.0
+  }
+ },
+ {
+  "iteration": 5,
+  "note": "iteration 5: pattern-search refinement of iter_04 with iter_04 cameras fixed (objective 0.95972), then cameras re-registered.",
+  "mean_iou_fitted": 0.9599435113591414,
+  "iou": {
+   "side": 0.9687,
+   "top": 0.9723,
+   "top_b": 0.9746,
+   "front": 0.9388
+  },
+  "boundary_mean_cm": {
+   "side": 2.4,
+   "top": 4.9,
+   "top_b": 4.5,
+   "front": 11.5
+  },
+  "boundary_p95_cm": {
+   "side": 11.9,
+   "top": 18.5,
+   "top_b": 14.9,
+   "front": 59.4
+  },
+  "aspect": {
+   "side": 1.0162,
+   "top": 0.995,
+   "top_b": 1.0057,
+   "front": 1.0
+  }
+ },
+ {
+  "iteration": 6,
+  "note": "iteration 6: pattern-search refinement of iter_05 with iter_05 cameras fixed (objective 0.96062), then cameras re-registered.",
+  "mean_iou_fitted": 0.9602918974697618,
+  "iou": {
+   "side": 0.9674,
+   "top": 0.973,
+   "top_b": 0.9752,
+   "front": 0.9405
+  },
+  "boundary_mean_cm": {
+   "side": 2.5,
+   "top": 4.8,
+   "top_b": 4.3,
+   "front": 11.4
+  },
+  "boundary_p95_cm": {
+   "side": 11.7,
+   "top": 18.0,
+   "top_b": 14.9,
+   "front": 59.2
+  },
+  "aspect": {
+   "side": 1.0159,
+   "top": 0.9955,
+   "top_b": 1.0061,
+   "front": 1.0
+  }
+ },
+ {
+  "iteration": 7,
+  "note": "iteration 7: pattern-search refinement of iter_06 with iter_06 cameras fixed (objective 0.96073), then cameras re-registered.",
+  "mean_iou_fitted": 0.9623423904148954,
+  "iou": {
+   "side": 0.971,
+   "top": 0.9736,
+   "top_b": 0.9756,
+   "front": 0.9425
+  },
+  "boundary_mean_cm": {
+   "side": 2.3,
+   "top": 4.7,
+   "top_b": 4.2,
+   "front": 11.1
+  },
+  "boundary_p95_cm": {
+   "side": 10.2,
+   "top": 17.8,
+   "top_b": 15.5,
+   "front": 58.1
+  },
+  "aspect": {
+   "side": 1.0159,
+   "top": 0.9923,
+   "top_b": 1.0056,
+   "front": 1.0
+  }
+ },
+ {
+  "iteration": 8,
+  "note": "iteration 8: pattern-search refinement of iter_07 with iter_07 cameras fixed (objective 0.96159), then cameras re-registered.",
+  "mean_iou_fitted": 0.9621354491933402,
+  "iou": {
+   "side": 0.9705,
+   "top": 0.9735,
+   "top_b": 0.9758,
+   "front": 0.9424
+  },
+  "boundary_mean_cm": {
+   "side": 2.3,
+   "top": 4.8,
+   "top_b": 4.2,
+   "front": 11.2
+  },
+  "boundary_p95_cm": {
+   "side": 10.2,
+   "top": 18.0,
+   "top_b": 15.4,
+   "front": 58.1
+  },
+  "aspect": {
+   "side": 1.0159,
+   "top": 0.9923,
+   "top_b": 1.0052,
+   "front": 1.0
+  }
+ },
+ {
+  "iteration": 9,
+  "note": "iteration 9: pattern-search refinement of iter_08 with iter_08 cameras fixed (objective 0.96153), then cameras re-registered.",
+  "mean_iou_fitted": 0.9621378598208606,
+  "iou": {
+   "side": 0.9701,
+   "top": 0.9734,
+   "top_b": 0.9762,
+   "front": 0.9428
+  },
+  "boundary_mean_cm": {
+   "side": 2.3,
+   "top": 4.9,
+   "top_b": 4.3,
+   "front": 11.1
+  },
+  "boundary_p95_cm": {
+   "side": 10.7,
+   "top": 17.7,
+   "top_b": 15.8,
+   "front": 58.6
+  },
+  "aspect": {
+   "side": 1.0158,
+   "top": 0.9923,
+   "top_b": 1.0052,
+   "front": 1.0
+  }
+ }
+]

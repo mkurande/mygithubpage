@@ -1,0 +1,352 @@
+<title>YF-23 Projection Fit</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Archivo:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a drafting sheet. Title block up top, then one reading column with full-width figures. */
+:root {
+  --paper: #f5f6f3;
+  --sheet: #fbfbf9;
+  --ink: #15191d;
+  --ink-2: #4b535b;
+  --ink-3: #6f777f;
+  --rule: #cfd4d6;
+  --accent: #1f4f8f;
+  --agree: #2f9e44;
+  --photo: #d63a3a;
+  --cad: #1e74d8;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100;
+  --display: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --body: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #121518; --sheet: #191d21; --ink: #eceeec; --ink-2: #b9c0c5; --ink-3: #8d959c; --rule: #343b41;
+    --accent: #7fb0ec; --agree: #4cc25f; --photo: #ef6b6b; --cad: #5aa2f0;
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #121518; --sheet: #191d21; --ink: #eceeec; --ink-2: #b9c0c5; --ink-3: #8d959c; --rule: #343b41;
+  --accent: #7fb0ec; --agree: #4cc25f; --photo: #ef6b6b; --cad: #5aa2f0;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; color-scheme: dark;
+}
+body { background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.55; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-block: 28px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 40px; }
+h1, h2, h3 { font-family: var(--display); font-weight: 600; letter-spacing: .01em; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); line-height: 1; }
+h2 { font-size: 1.65rem; line-height: 1.1; }
+h3 { font-size: 1.15rem; }
+p { margin: 0; max-width: 68ch; }
+.eyebrow { font-family: var(--mono); font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+section { display: grid; gap: 14px; min-width: 0; }
+.sec-head { display: grid; gap: 6px; border-top: 1.5px solid var(--ink); padding-top: 10px; }
+.lede { color: var(--ink-2); font-size: 1.05rem; }
+.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+/* title block */
+.head { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 28px; align-items: end; }
+.tblock { border: 1.5px solid var(--ink); display: grid; grid-template-columns: 1fr 1fr; background: var(--sheet); }
+.tblock > div { padding: 8px 12px; border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule); display: grid; gap: 2px; min-width: 0; }
+.tblock > div:nth-child(2n) { border-right: none; }
+.tblock > div:nth-last-child(-n+2) { border-bottom: none; }
+.tblock .k { font-family: var(--mono); font-size: .66rem; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+.tblock .v { font-family: var(--display); font-size: 1.55rem; font-weight: 600; line-height: 1.05; }
+.tblock .v small { font-family: var(--mono); font-size: .72rem; font-weight: 400; color: var(--ink-2); }
+.pill { display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: .72rem; padding: 2px 8px; border: 1px solid currentColor; border-radius: 3px; width: fit-content; }
+.pill.ok { color: var(--agree); }
+@media (max-width: 760px) { .head { grid-template-columns: 1fr; } }
+
+/* chart */
+.chart-box { background: var(--sheet); border: 1px solid var(--rule); padding: 14px 12px 8px; display: grid; gap: 8px; min-width: 0; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: .85rem; color: var(--ink-2); }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+.legend i { width: 18px; height: 0; border-top: 2px solid; display: inline-block; }
+.legend i.dash { border-top-style: dashed; }
+.chart { position: relative; overflow-x: auto; }
+.chart svg { display: block; width: 100%; min-width: 520px; height: auto; }
+.chart text { font-family: var(--mono); font-size: 11px; fill: var(--ink-3); }
+.chart .lab { font-size: 11px; fill: var(--ink-2); }
+.tip { position: absolute; pointer-events: none; background: var(--sheet); border: 1px solid var(--ink); padding: 6px 9px; font-family: var(--mono); font-size: .75rem; line-height: 1.5; min-width: 150px; box-shadow: 2px 2px 0 var(--rule); }
+.tip b { font-family: var(--display); font-size: .95rem; }
+.tip .row { display: flex; justify-content: space-between; gap: 12px; }
+.tip .sw { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
+details { border-top: 1px solid var(--rule); padding-top: 6px; }
+summary { cursor: pointer; font-size: .85rem; color: var(--accent); width: fit-content; }
+summary:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tbl { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: .85rem; }
+th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font-family: var(--mono); font-weight: 600; font-size: .68rem; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+td.n, th.n { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+tr.best td { background: color-mix(in srgb, var(--accent) 9%, transparent); font-weight: 600; }
+
+/* figures */
+figure { margin: 0; display: grid; gap: 8px; }
+figure img { width: 100%; height: auto; border: 1px solid var(--rule); background: #fff; }
+figcaption { font-size: .85rem; color: var(--ink-2); }
+.key { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .82rem; color: var(--ink-2); }
+.key span { display: inline-flex; gap: 6px; align-items: center; }
+.key i { width: 12px; height: 12px; display: inline-block; border-radius: 2px; }
+
+/* iteration viewer */
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.tabs button { font-family: var(--mono); font-size: .8rem; padding: 6px 12px; background: var(--sheet); color: var(--ink); border: 1px solid var(--rule); border-radius: 3px; cursor: pointer; }
+.tabs button[aria-selected="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.note { font-size: .9rem; color: var(--ink-2); max-width: 80ch; }
+
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+.cols > div { display: grid; gap: 8px; align-content: start; min-width: 0; }
+ul.plain { margin: 0; padding-left: 1.1em; display: grid; gap: 6px; max-width: 72ch; }
+.sev { display: inline-block; font-family: var(--mono); font-size: .66rem; letter-spacing: .06em; text-transform: uppercase; padding: 1px 6px; border-radius: 2px; margin-right: 6px; border: 1px solid; }
+.sev.hi { color: var(--photo); } .sev.md { color: var(--s4); } .sev.lo { color: var(--ink-3); }
+a { color: var(--accent); }
+code { font-family: var(--mono); font-size: .85em; }
+@media (prefers-reduced-motion: no-preference) { .tabs button { transition: background .15s, color .15s; } }
+</style>
+
+<div class="wrap">
+  <header class="head">
+    <div style="display:grid;gap:12px;min-width:0">
+      <div class="eyebrow">Northrop YF-23A (PAV-1, 87-0800) · exterior CAD · projection fit</div>
+      <h1>YF-23 Projection Fit</h1>
+      <p class="lede">A fresh parametric CAD model of the YF-23, fitted to real photographs so its side, top and front silhouettes match. Each iteration re-registers a camera to every photo, then reshapes the CAD to raise silhouette overlap (IoU). Overall length and span stay locked to published dimensions.</p>
+    </div>
+    <div class="tblock" aria-label="Result summary">
+      <div><span class="k">Best iteration</span><span class="v">iter_07</span></div>
+      <div><span class="k">Status</span><span class="pill ok">plateau reached</span></div>
+      <div><span class="k">Mean IoU (side, top, front)</span><span class="v num">0.962 <small>from 0.864</small></span></div>
+      <div><span class="k">Hold-out top photo</span><span class="v num">0.976 <small>never fitted</small></span></div>
+      <div><span class="k">Mean edge error</span><span class="v num">2.3 / 4.7 / 11.1 <small>cm</small></span></div>
+      <div><span class="k">Locked dimensions</span><span class="v num">20.55 × 13.28 <small>m, L × b</small></span></div>
+    </div>
+  </header>
+
+  <section>
+    <div class="sec-head">
+      <h2>Silhouette IoU by iteration</h2>
+      <p class="lede">Every iteration scored under one registration protocol. Iterations 08 and 09 gave no further gain, so 07 is the result.</p>
+    </div>
+    <div class="chart-box">
+      <div class="legend" aria-hidden="true">
+        <span><i style="border-color:var(--s1)"></i>Side</span>
+        <span><i style="border-color:var(--s2)"></i>Top (fitted)</span>
+        <span><i style="border-color:var(--s3)"></i>Front</span>
+        <span><i class="dash" style="border-color:var(--s4)"></i>Top hold-out (not fitted)</span>
+      </div>
+      <div class="chart" id="chart"><div class="tip" id="tip" hidden></div></div>
+      <details>
+        <summary>Show as table</summary>
+        <div class="tbl">
+          <table>
+            <thead><tr><th>Iter</th><th class="n">Mean</th><th class="n">Side</th><th class="n">Top</th><th class="n">Front</th><th class="n">Top hold-out</th><th class="n">Edge err side / top / front (cm)</th></tr></thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <h2>Before and after</h2>
+      <p class="lede">Left: iteration 00, built from published dimensions only. Right: iteration 07. Overlays sit on the registered photo.</p>
+    </div>
+    <div class="key">
+      <span><i style="background:var(--agree)"></i>CAD and photo agree</span>
+      <span><i style="background:var(--photo)"></i>Photo only (CAD missing)</span>
+      <span><i style="background:var(--cad)"></i>CAD only (excess)</span>
+    </div>
+    <figure>
+      <img src="img/compare_00_vs_07.jpg" alt="Side, top and front overlays for iteration 00 and iteration 07" loading="lazy">
+      <figcaption>The top view's nose, tails and W-shaped aft deck, the side view's canopy, intake and tail, and the front view's intakes all close up between 00 and 07.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <h2>Iteration viewer</h2>
+      <p class="lede">The full four-view panel for each milestone iteration.</p>
+    </div>
+    <div class="tabs" role="tablist" id="tabs"></div>
+    <p class="note" id="itnote"></p>
+    <figure><img id="itimg" src="img/panel_07.jpg" alt="Overlay panel for the selected iteration"></figure>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <h2>Model shape</h2>
+      <p class="lede">Shaded checks, used to catch optimizer artefacts that silhouettes can't show. Gear down, about 0.36 M triangles.</p>
+    </div>
+    <div class="cols">
+      <div><figure><img src="img/shaded_00.jpg" alt="Shaded views of iteration 00" loading="lazy"><figcaption>Iteration 00: trapezoid tails, wing-root notch, no aft-deck notches.</figcaption></figure></div>
+      <div><figure><img src="img/shaded_07.jpg" alt="Shaded views of iteration 07" loading="lazy"><figcaption>Iteration 07: pentagon V-tails canted about 52°, trapezoid intakes, W-shaped exhaust deck.</figcaption></figure></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <h2>What remains</h2>
+      <p class="lede">The parametric search has plateaued. These are the differences still visible at iteration 07, with my read on whether each is geometry or camera.</p>
+    </div>
+    <ul class="plain">
+      <li><span class="sev md">front</span>IoU 0.943, the weakest view. The photo is a close-range (about 16 m) museum shot with clutter, so the reference is hand-traced. Excess at the centre-body bottom and a slight mismatch of the edge-on V-tails remain. The tails are thin, so a small angle error gives a large p95 edge distance (about 58 cm) and little IoU.</li>
+      <li><span class="sev md">top</span>A thin red wedge along the forebody chine appears on opposite sides in the two top photos. That points to bank and lateral camera offset exposing the forebody side, not a symmetric shape error.</li>
+      <li><span class="sev lo">top</span>Small misses at the exhaust-trough sidewall tips. The aft deck is modelled with simple plates, not the true trough geometry.</li>
+      <li><span class="sev lo">side</span>Edge error is now about 2.3 cm. What's left is at the intake lower lip and the V-tail tip.</li>
+      <li><span class="sev hi">data</span>The fitted top photo is only 640 × 480; Commons serves it upscaled. The higher-resolution 1800 px top photo is the hold-out. It scores higher (0.976), so the fit is not leaning on the weak image, but the roles should be swapped in the next round.</li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <h2>References</h2>
+      <p class="lede">Real photographs only; no drawings or generated imagery. Both prototypes share an outer mould line; every selected photo is PAV-1.</p>
+    </div>
+    <div class="tbl">
+      <table>
+        <thead><tr><th>View</th><th>Photo</th><th>Camera</th><th>Quality</th><th>Licence</th></tr></thead>
+        <tbody>
+          <tr><td>Side</td><td><a href="https://commons.wikimedia.org/wiki/File:YF-23_left_view.jpg" target="_blank" rel="noopener">YF-23 left view</a> · USAF 060810-F-1234S-007</td><td>In flight, port side, telephoto (near-orthographic), gear up</td><td>1800 × 1262; clean sky; automatic mask with canopy hull fill</td><td>Public domain</td></tr>
+          <tr><td>Top (fitted)</td><td><a href="https://commons.wikimedia.org/wiki/File:Yf-23_1.jpg" target="_blank" rel="noopener">Yf-23 1</a> · U.S. Navy</td><td>In flight, from above, banked about 7°</td><td>640 × 480, low; automatic mask</td><td>Public domain</td></tr>
+          <tr><td>Top (hold-out)</td><td><a href="https://commons.wikimedia.org/wiki/File:YF-23_top_view.jpg" target="_blank" rel="noopener">YF-23 top view</a> · USAF 060810-F-1234S-004</td><td>In flight, from above</td><td>1800 × 1435, good; never used for fitting</td><td>Public domain</td></tr>
+          <tr><td>Front</td><td><a href="https://commons.wikimedia.org/wiki/File:Northrop_McDonnell_Douglas_YF-23A_PAV-1_87-0800_Black_Widow_II_HeadOn_R%26D_NMUSAF_25Sep09_(14599837582).jpg" target="_blank" rel="noopener">NMUSAF head-on</a> · Valder137, 2009</td><td>Ground, gear down, about 16 m perspective</td><td>1200 × 803; cluttered; hand-traced, gear and an occluded patch excluded</td><td>CC BY 2.0</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>Method and limits</h2></div>
+    <div class="cols">
+      <div>
+        <h3>How each iteration runs</h3>
+        <ul class="plain">
+          <li>Register a perspective camera to each photo: pose within ±12°, position, focal length, and for scanned prints a pixel aspect within ±5%.</li>
+          <li>Hold the cameras fixed. A pattern search moves about 190 control points (fuselage, canopy, nacelle and intake curves, wing, V-tail and exhaust values) to raise mean IoU, with a smoothness penalty.</li>
+          <li>Nose position, overall length (20.55 m) and semispan (6.64 m) are locked, so photos constrain proportions and published figures set size.</li>
+          <li>Re-register all cameras and score at full resolution: IoU, plus mean, p95 and maximum edge distance in metres.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Limits of these numbers</h3>
+        <ul class="plain">
+          <li>IoU measures silhouettes only. It says nothing about surfaces inside the outline, such as trough depth or the intake interior.</li>
+          <li>Three fitted photos give three viewpoints. Camera pose and shape are fitted together, so some error can hide in the camera. The hold-out photo is the guard against that.</li>
+          <li>Iteration 00 needed a 0.951 pixel aspect to fit; by iteration 07 every aspect is within 1.6% of 1. The early length-to-span conflict came from CAD shape, not the published dimensions.</li>
+          <li>No photogrammetry, surface-distance or volume comparison yet. Those need overlapping imagery that hasn't been gathered.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+const H = [[0,0.8635,0.847,0.882,0.8615,0.8824,12.6,29.9,13.6],[1,0.9072,0.9008,0.9378,0.883,0.9378,8.0,16.9,13.9],[2,0.9465,0.961,0.9698,0.9089,0.9708,3.1,5.5,12.8],[3,0.9535,0.961,0.9701,0.9293,0.9725,3.0,5.3,12.0],[4,0.9557,0.9595,0.9713,0.9362,0.9736,3.1,5.3,11.7],[5,0.9599,0.9687,0.9723,0.9388,0.9746,2.4,4.9,11.5],[6,0.9603,0.9674,0.973,0.9405,0.9752,2.5,4.8,11.4],[7,0.9623,0.971,0.9736,0.9425,0.9756,2.3,4.7,11.1],[8,0.9621,0.9705,0.9735,0.9424,0.9758,2.3,4.8,11.2],[9,0.9621,0.9701,0.9734,0.9428,0.9762,2.3,4.9,11.1]];
+const SER = [
+  {k:2, name:"Side", c:"--s1"},
+  {k:3, name:"Top", c:"--s2"},
+  {k:4, name:"Front", c:"--s3"},
+  {k:5, name:"Top hold-out", c:"--s4", dash:true},
+];
+const NOTES = {
+  "00": "Iteration 00. First guess from published dimensions only: length 20.55 m, span 13.28 m, 40° diamond wing, V-tails at 50°. Mean IoU 0.864.",
+  "01": "Iteration 01. Structural fixes: pentagon V-tails, intakes narrowing downward, W-shaped aft deck, wing carried through the fuselage. Values measured by back-projecting photo points through the registered cameras. Mean IoU 0.907.",
+  "02": "Iteration 02. First constrained optimizer pass over 114 control points, cameras held fixed, then re-registered. Front trace corrected to v2 after review. Mean IoU 0.947.",
+  "04": "Iteration 04. Two more passes. Gains are flattening, and remaining errors need more control points and correlated moves. Mean IoU 0.956.",
+  "07": "Iteration 07 (best). Denser control points (193), whole-curve shift moves, exhaust sidewall flare, and a higher-resolution objective. Mean IoU 0.962; top hold-out 0.976. Iterations 08 and 09 gave no gain."
+};
+
+function css(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+function drawChart(){
+  const box = document.getElementById("chart");
+  const tip = document.getElementById("tip");
+  box.querySelectorAll("svg").forEach(s => s.remove());
+  const W = 760, Hh = 320, m = {l:48, r:112, t:14, b:34};
+  const x = i => m.l + (W - m.l - m.r) * i / 9;
+  const y0 = 0.84, y1 = 0.98;
+  const y = v => m.t + (Hh - m.t - m.b) * (1 - (v - y0) / (y1 - y0));
+  const ns = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(ns, "svg");
+  svg.setAttribute("viewBox", `0 0 ${W} ${Hh}`);
+  svg.setAttribute("role", "img");
+  svg.setAttribute("aria-label", "Line chart of silhouette IoU by iteration for side, top, front and the top hold-out photo, rising from about 0.85 to about 0.96 to 0.98.");
+  const el = (t, a, p = svg) => { const e = document.createElementNS(ns, t); for (const k in a) e.setAttribute(k, a[k]); p.appendChild(e); return e; };
+  const rule = css("--rule"), ink3 = css("--ink-3");
+  for (let v = 0.84; v <= 0.9801; v += 0.02) {
+    el("line", {x1:m.l, x2:W - m.r, y1:y(v), y2:y(v), stroke:rule, "stroke-width":1});
+    const t = el("text", {x:m.l - 8, y:y(v) + 4, "text-anchor":"end"}); t.textContent = v.toFixed(2);
+  }
+  for (let i = 0; i <= 9; i++) {
+    const t = el("text", {x:x(i), y:Hh - m.b + 18, "text-anchor":"middle"}); t.textContent = String(i).padStart(2, "0");
+  }
+  const xl = el("text", {x:(m.l + W - m.r) / 2, y:Hh - 2, "text-anchor":"middle"}); xl.textContent = "iteration";
+  el("line", {x1:x(7), x2:x(7), y1:m.t, y2:Hh - m.b, stroke:ink3, "stroke-width":1, "stroke-dasharray":"2 4"});
+  const bl = el("text", {x:x(7) + 4, y:m.t + 10}); bl.textContent = "best";
+  const ends = [];
+  SER.forEach(s => {
+    const col = css(s.c);
+    const d = H.map((r, i) => (i ? "L" : "M") + x(r[0]).toFixed(1) + "," + y(r[s.k]).toFixed(1)).join(" ");
+    el("path", {d, fill:"none", stroke:col, "stroke-width":2, "stroke-linejoin":"round", "stroke-linecap":"round", ...(s.dash ? {"stroke-dasharray":"6 4"} : {})});
+    const last = H[H.length - 1];
+    el("circle", {cx:x(last[0]), cy:y(last[s.k]), r:4, fill:col, stroke:css("--sheet"), "stroke-width":2});
+    ends.push({y:y(last[s.k]), s, v:last[s.k]});
+  });
+  // direct labels at the line ends, nudged apart so they never collide
+  ends.sort((a, b) => a.y - b.y);
+  for (let i = 1; i < ends.length; i++) if (ends[i].y - ends[i - 1].y < 13) ends[i].y = ends[i - 1].y + 13;
+  ends.forEach(e => { const t = el("text", {x:W - m.r + 10, y:e.y + 4, class:"lab"}); t.textContent = `${e.s.name} ${e.v.toFixed(3)}`; });
+  // hover layer: vertical crosshair + tooltip
+  const cross = el("line", {y1:m.t, y2:Hh - m.b, stroke:css("--ink"), "stroke-width":1, opacity:0});
+  const dots = SER.map(s => el("circle", {r:4.5, fill:css(s.c), stroke:css("--sheet"), "stroke-width":2, opacity:0}));
+  const hit = el("rect", {x:m.l, y:m.t, width:W - m.l - m.r, height:Hh - m.t - m.b, fill:"transparent"});
+  function show(ev){
+    const r = svg.getBoundingClientRect();
+    const px = (ev.clientX - r.left) * W / r.width;
+    const i = Math.max(0, Math.min(9, Math.round((px - m.l) / ((W - m.l - m.r) / 9))));
+    const row = H[i];
+    cross.setAttribute("x1", x(i)); cross.setAttribute("x2", x(i)); cross.setAttribute("opacity", .35);
+    dots.forEach((dt, j) => { dt.setAttribute("cx", x(i)); dt.setAttribute("cy", y(row[SER[j].k])); dt.setAttribute("opacity", 1); });
+    tip.innerHTML = `<b>Iteration ${String(i).padStart(2, "0")}</b><div class="row"><span>Mean</span><span>${row[1].toFixed(4)}</span></div>` +
+      SER.map(s => `<div class="row"><span><i class="sw" style="background:var(${s.c})"></i>${s.name}</span><span>${row[s.k].toFixed(4)}</span></div>`).join("");
+    tip.hidden = false;
+    const bx = box.getBoundingClientRect();
+    let left = ev.clientX - bx.left + box.scrollLeft + 14;
+    if (left + 190 > box.scrollWidth) left = ev.clientX - bx.left + box.scrollLeft - 200;
+    tip.style.left = left + "px"; tip.style.top = "8px";
+  }
+  function hide(){ cross.setAttribute("opacity", 0); dots.forEach(d => d.setAttribute("opacity", 0)); tip.hidden = true; }
+  hit.addEventListener("pointermove", show);
+  hit.addEventListener("pointerdown", show);
+  hit.addEventListener("pointerleave", hide);
+  box.insertBefore(svg, tip);
+}
+
+function fillTable(){
+  document.getElementById("tbody").innerHTML = H.map(r =>
+    `<tr class="${r[0] === 7 ? "best" : ""}"><td class="num">${String(r[0]).padStart(2, "0")}${r[0] === 7 ? " (best)" : ""}</td><td class="n">${r[1].toFixed(4)}</td><td class="n">${r[2].toFixed(4)}</td><td class="n">${r[3].toFixed(4)}</td><td class="n">${r[4].toFixed(4)}</td><td class="n">${r[5].toFixed(4)}</td><td class="n">${r[6]} / ${r[7]} / ${r[8]}</td></tr>`).join("");
+}
+
+function tabs(){
+  const box = document.getElementById("tabs"), img = document.getElementById("itimg"), note = document.getElementById("itnote");
+  const keys = Object.keys(NOTES);
+  keys.forEach(k => {
+    const b = document.createElement("button");
+    b.id = "tab-" + k; b.type = "button"; b.setAttribute("role", "tab"); b.textContent = "iter_" + k;
+    b.addEventListener("click", () => select(k));
+    box.appendChild(b);
+  });
+  function select(k){
+    keys.forEach(j => document.getElementById("tab-" + j).setAttribute("aria-selected", j === k ? "true" : "false"));
+    img.src = "img/panel_" + k + ".jpg"; img.alt = "Overlay panel for iteration " + k; note.textContent = NOTES[k];
+  }
+  select("07");
+}
+
+drawChart(); fillTable(); tabs();
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", drawChart);
+new MutationObserver(drawChart).observe(document.documentElement, {attributes:true, attributeFilter:["data-theme"]});
+</script>

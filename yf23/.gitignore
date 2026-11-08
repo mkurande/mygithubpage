@@ -1,0 +1,7 @@
+refs/raw/
+iterations/*/*.npy
+iterations/iter_0[1-689]/overlay_*.jpg
+__pycache__/
+*.pyc
+exports/*detailed*
+exports/*.stl
