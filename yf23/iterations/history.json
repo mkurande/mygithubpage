@@ -463,5 +463,101 @@
     "median": 0.7821
    }
   }
+ },
+ {
+  "iteration": 13,
+  "note": "iteration 13: refinement with silhouette IoU (side/top/front) plus SfM point-to-surface term (w=0.3, 1215 fit points from sfm/nmusaf) plus banded multi-view silhouettes from 58 SfM-posed museum photos (w=1.5, per-view cameras refined: mv_cams_iter12.json), cameras from iter_12; then re-registered.",
+  "mean_iou_fitted": 0.9627154531316203,
+  "iou": {
+   "side": 0.9714,
+   "top": 0.9749,
+   "top_b": 0.9772,
+   "front": 0.9418
+  },
+  "boundary_mean_cm": {
+   "side": 2.2,
+   "top": 4.6,
+   "top_b": 4.0,
+   "front": 11.1
+  },
+  "boundary_p95_cm": {
+   "side": 10.1,
+   "top": 17.0,
+   "top_b": 14.7,
+   "front": 57.4
+  },
+  "aspect": {
+   "side": 1.0156,
+   "top": 0.9922,
+   "top_b": 1.0046,
+   "front": 1.0
+  },
+  "sfm_points_after": {
+   "fit": {
+    "n": 1207,
+    "median_abs_cm": 3.15,
+    "mean_abs_cm": 6.87,
+    "p90_abs_cm": 20.7,
+    "median_signed_cm": 0.87
+   },
+   "holdout": {
+    "n": 301,
+    "median_abs_cm": 3.36,
+    "mean_abs_cm": 6.88,
+    "p90_abs_cm": 19.46,
+    "median_signed_cm": 0.85
+   }
+  },
+  "sfm_points_before": {
+   "fit": {
+    "n": 1215,
+    "median_abs_cm": 3.66,
+    "mean_abs_cm": 7.16,
+    "p90_abs_cm": 20.9,
+    "median_signed_cm": 1.05
+   },
+   "holdout": {
+    "n": 303,
+    "median_abs_cm": 3.63,
+    "mean_abs_cm": 7.17,
+    "p90_abs_cm": 21.96,
+    "median_signed_cm": 0.85
+   }
+  },
+  "multiview_before": {
+   "fit": {
+    "n": 58,
+    "mean": 0.8307,
+    "median": 0.8237
+   },
+   "holdout": {
+    "n": 19,
+    "mean": 0.8317,
+    "median": 0.8173
+   }
+  },
+  "multiview_after": {
+   "fit": {
+    "n": 58,
+    "mean": 0.825,
+    "median": 0.8135
+   },
+   "holdout": {
+    "n": 19,
+    "mean": 0.8275,
+    "median": 0.8166
+   }
+  },
+  "multiview_same_alignment": {
+   "note": "banded IoU with the alignment the per-view cameras were refined against (align_iter_12) and band from iter_12; the default 'after' numbers mix in a 3 cm ICP re-alignment",
+   "iter_12": {
+    "fit": 0.8323,
+    "holdout": 0.8334
+   },
+   "iter_13": {
+    "fit": 0.8365,
+    "holdout": 0.839
+   }
+  }
  }
 ]
