@@ -93,7 +93,7 @@ class Mesh:
         return Mesh(np.vstack(vs), np.vstack(fs), np.concatenate(ps))
 
 
-PARTS = ["fuselage", "canopy", "wing", "nacelle", "vtail", "gear"]
+PARTS = ["fuselage", "canopy", "wing", "nacelle", "vtail", "gear", "intake", "frame", "probe"]
 
 
 def grid_mesh(P, part, close_u=False, cap_start=False, cap_end=False):
@@ -127,14 +127,15 @@ def grid_mesh(P, part, close_u=False, cap_start=False, cap_end=False):
 # --------------------------------------------------------------------------
 # section shape: chined superellipse (upper and lower lobes meet at the chine)
 # --------------------------------------------------------------------------
-def chined_section(w, zc, zt, zb, nu_, nl_, nu, yc=0.0, kchine=0.0):
+def chined_section(w, zc, zt, zb, nu_, nl_, nu, yc=0.0, kchine=0.0, t=None):
     """Closed section; returns (nu, 2) array of (y, z), counter-clockwise from +y chine.
 
     w: half width at chine, zc: chine height, zt: top, zb: bottom.
     nu_/nl_: superellipse exponents (2=ellipse, larger=boxier, <2=diamond).
     kchine: sharpens the chine by pinching the lobes near the edge (0..1).
     """
-    t = np.linspace(0, 2 * np.pi, nu, endpoint=False)
+    if t is None:
+        t = np.linspace(0, 2 * np.pi, nu, endpoint=False)
     c, s = np.cos(t), np.sin(t)
     up = s >= 0
     ey = np.where(up, 2 / nu_, 2 / nl_)
@@ -148,13 +149,46 @@ def chined_section(w, zc, zt, zb, nu_, nl_, nu, yc=0.0, kchine=0.0):
 
 
 # --------------------------------------------------------------------------
+# adaptive sampling: put stations where the surface bends
+# --------------------------------------------------------------------------
+def adaptive_stations(p, keys, x0, x1, n, gain=3.0, extra=()):
+    """Stations on [x0, x1] with density 1 + gain * normalised |second derivative| of the given curves."""
+    xf = np.linspace(x0, x1, 2000)
+    act = np.zeros_like(xf)
+    for k in keys:
+        if k in p:
+            y = curve(p, k, xf)
+            act += np.abs(np.gradient(np.gradient(y, xf), xf))
+    for xe, w in extra:  # point features (e.g. canopy ends, intake lip): local bumps
+        act += w * np.exp(-0.5 * ((xf - xe) / 0.25) ** 2)
+    act = act / (act.mean() + 1e-12)
+    dens = 1.0 + gain * np.clip(act, 0, 8)
+    cdf = np.concatenate([[0], np.cumsum(0.5 * (dens[1:] + dens[:-1]) * np.diff(xf))])
+    cdf /= cdf[-1]
+    return np.interp(np.linspace(0, 1, n), cdf, xf)
+
+
+def chine_clustered(nu, c=0.55):
+    """Section angles clustered towards the chines (t = 0 and pi)."""
+    u = np.linspace(0, 2 * np.pi, nu, endpoint=False)
+    return u - 0.5 * c * np.sin(2 * u)
+
+
+# --------------------------------------------------------------------------
 # components
 # --------------------------------------------------------------------------
 def fuselage(p, nx, nu):
     x0, x1 = p["fus_x"]
     # cosine clustering at the nose for curvature resolution
     s = np.linspace(0, 1, nx)
-    xs = x0 + (x1 - x0) * (1 - np.cos(s * np.pi / 2) ** 1.0) if False else x0 + (x1 - x0) * (0.5 - 0.5 * np.cos(np.pi * s))
+    D = p.get("detail")
+    if D:
+        xs = adaptive_stations(p, ["fus_halfwidth", "fus_top", "fus_bottom", "fus_chine_z"], x0, x1, nx,
+                               extra=[(p["can_x"][0], 2.0), (p["can_x"][1], 1.0), (0.0, 4.0)])
+        tt = chine_clustered(nu)
+    else:
+        xs = x0 + (x1 - x0) * (0.5 - 0.5 * np.cos(np.pi * s))
+        tt = None
     w = np.maximum(curve(p, "fus_halfwidth", xs), 1e-3)
     zt = curve(p, "fus_top", xs)
     zb = curve(p, "fus_bottom", xs)
@@ -165,10 +199,22 @@ def fuselage(p, nx, nu):
     el = curve(p, "fus_exp_lower", xs)
     P = np.zeros((nx, nu, 3))
     for i, x in enumerate(xs):
-        sec = chined_section(w[i], zc[i], zt[i], zb[i], eu[i], el[i], nu, kchine=p.get("chine_sharp", 0.0))
+        sec = chined_section(w[i], zc[i], zt[i], zb[i], eu[i], el[i], nu, kchine=p.get("chine_sharp", 0.0), t=tt)
         P[i, :, 0] = x
         P[i, :, 1:] = sec
     return grid_mesh(P, "fuselage", close_u=True, cap_end=True)
+
+
+def fus_surface_z(p, x, y):
+    """Height of the fuselage upper surface at station x and lateral position y (|y| <= half width)."""
+    x = np.atleast_1d(np.asarray(x, float))
+    w = np.maximum(curve(p, "fus_halfwidth", x), 1e-3)
+    zt, zc = curve(p, "fus_top", x), curve(p, "fus_chine_z", x)
+    eu = curve(p, "fus_exp_upper", x)
+    k = p.get("chine_sharp", 0.0)
+    c = np.clip(np.abs(np.asarray(y, float)) / w, 0, 1) ** (eu / 2)
+    sn = np.sqrt(np.clip(1 - c ** 2, 0, 1))
+    return zc + (np.maximum(zt, zc) - zc) * (sn ** (2 / eu)) ** (1 + k)
 
 
 def canopy(p, nx, nu):
@@ -181,12 +227,18 @@ def canopy(p, nx, nu):
     zt = np.maximum(zt, zb + 1e-3)
     P = np.zeros((nx, nu, 3))
     t = np.linspace(0, np.pi, nu)
+    seat = p.get("detail") is not None  # detail models seat the canopy on the real fuselage surface
     for i, x in enumerate(xs):
         c, sn = np.cos(t), np.sin(t)
         e = 2 / p["can_exp"]
+        yy = w[i] * np.sign(c) * np.abs(c) ** e
         P[i, :, 0] = x
-        P[i, :, 1] = w[i] * np.sign(c) * np.abs(c) ** e
-        P[i, :, 2] = zb[i] + (zt[i] - zb[i]) * np.abs(sn) ** e
+        P[i, :, 1] = yy
+        if seat:
+            base = fus_surface_z(p, np.full_like(yy, x), yy) - 0.02
+            P[i, :, 2] = base + np.maximum(zt[i] - base[nu // 2], 0) * np.abs(sn) ** e
+        else:
+            P[i, :, 2] = zb[i] + (zt[i] - zb[i]) * np.abs(sn) ** e
     return grid_mesh(P, "canopy")
 
 
@@ -223,23 +275,29 @@ def wing(p, ns, nc):
 
 def nacelles(p, nx, nu):
     N = p["nacelle"]
+    D = p.get("detail") or {}
     meshes = []
     x0, x1 = N["x"]
     s = np.linspace(0, 1, nx)
     xs = x0 + (x1 - x0) * s
+    if D:
+        xs = adaptive_stations(p, ["nac_y", "nac_halfwidth", "nac_top", "nac_bottom"], x0, x1, nx,
+                               extra=[(x0, 6.0), (D.get("trough", {}).get("x0", x1), 2.0)])
     yc = curve(p, "nac_y", xs)
     w = np.maximum(curve(p, "nac_halfwidth", xs), 1e-3)
     zt = curve(p, "nac_top", xs)
     zb = curve(p, "nac_bottom", xs)
     el = curve(p, "nac_exp", xs)
+    et = curve(p, "nac_exp_top", xs) if "nac_exp_top" in p else el
     legacy = "nac_bottom_ratio" not in p  # iteration-00 parameter files
     br = curve(p, "nac_bottom_ratio", xs) if not legacy else np.ones_like(xs)
     sh = curve(p, "nac_bottom_shift", xs) if not legacy else np.zeros_like(xs)
+    tr = D.get("trough")
     for sgn in (1, -1):
         P = np.zeros((nx, nu, 3))
         for i, x in enumerate(xs):
             zc = 0.5 * (zt[i] + zb[i])
-            sec = chined_section(w[i], zc, zt[i], zb[i], el[i], el[i], nu)
+            sec = chined_section(w[i], zc, zt[i], zb[i], et[i], el[i], nu)
             yy, zz = sec[:, 0], sec[:, 1]
             h = (zz - zb[i]) / max(zt[i] - zb[i], 1e-3)  # 0 at bottom, 1 at top
             if legacy:
@@ -247,13 +305,45 @@ def nacelles(p, nx, nu):
             else:
                 scale = br[i] + (1 - br[i]) * h            # bottom narrower when br < 1
                 yy = yy * scale + sh[i] * (1 - h)          # sh: inboard(-)/outboard(+) shift of the bottom
+            if tr and x > tr["x0"]:
+                # recessed exhaust trough in the upper deck, ramping down towards the nacelle end
+                ramp = min(1.0, (x - tr["x0"]) / max(tr["ramp"], 1e-3))
+                u = np.abs(yy) / (tr["half_width_frac"] * w[i])
+                cup = np.clip(1 - u ** 8, 0, 1) * (zz > zc)
+                zz = zz - tr["depth"] * ramp * cup
             P[i, :, 0] = x
             P[i, :, 1] = sgn * (yc[i] + yy)
             P[i, :, 2] = zz
         if sgn < 0:
             P = P[:, ::-1]
-        meshes.append(grid_mesh(P, "nacelle", close_u=True, cap_start=True, cap_end=True))
+        intake = D.get("intake")
+        meshes.append(grid_mesh(P, "nacelle", close_u=True, cap_start=not intake, cap_end=True))
+        if intake:
+            meshes.extend(intake_duct(P, xs, intake))
     return Mesh.concat(meshes)
+
+
+def intake_duct(P, xs, I):
+    """Open intake: lip ring, inner duct running aft, engine face with a hub."""
+    k = max(3, int(np.searchsorted(xs, xs[0] + I["duct_len"])))
+    ring0 = P[0]
+    ctr = ring0.mean(0)
+    rad = np.linalg.norm(ring0[:, 1:] - ctr[1:], axis=1).mean()
+    f = max(0.2, 1 - I["lip"] / rad)
+    inner = np.empty((k, P.shape[1], 3))
+    for i in range(k):
+        c = P[i].mean(0)
+        shrink = f * (1 - I.get("taper", 0.15) * i / max(k - 1, 1))
+        inner[i] = c + (P[i] - c) * shrink
+        inner[i, :, 0] = P[i, :, 0] + I["lip"] * 0.5
+    lip = np.stack([ring0, inner[0]], 0)
+    out = [grid_mesh(lip, "nacelle", close_u=True),
+           grid_mesh(inner[:, ::-1], "intake", close_u=True)]  # reversed winding: faces inward
+    face = inner[-1]
+    c = face.mean(0)
+    hub = c + np.array([-0.25, 0, 0])
+    out.append(grid_mesh(np.stack([face[::-1], c + (face[::-1] - c) * 0.3, np.repeat(hub[None], len(face), 0)], 0), "intake", close_u=True))
+    return out
 
 
 def vtail_chord(T, r):
@@ -371,7 +461,12 @@ def build(p, density=1.0, gear_down=True):
     ]
     if "exhaust" in p:
         parts.append(exhaust_sidewalls(p))
-    if gear_down:
+    if p.get("detail"):
+        import yf23_detail as YD
+        parts.extend(YD.details(p, density))
+        if gear_down:
+            parts.append(YD.gear_detailed(p, density))
+    elif gear_down:
         parts.append(gear(p, k(16)))
     return Mesh.concat(parts)
 

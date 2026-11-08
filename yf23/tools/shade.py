@@ -54,7 +54,8 @@ def render(mesh, cam, light=(0.4, -0.5, 0.75)):
     n /= np.linalg.norm(n, axis=1, keepdims=True) + 1e-12
     L = np.asarray(light, float); L /= np.linalg.norm(L)
     s = 70 + 170 * np.abs(n @ L)
-    img = _zbuf(np.ascontiguousarray(uv[mesh.f]), np.ascontiguousarray(d[mesh.f]), s, cam["H"], cam["W"])
+    keep = (d[mesh.f] > 0.1).all(1)  # near-plane cull: drop triangles touching the region behind the camera
+    img = _zbuf(np.ascontiguousarray(uv[mesh.f][keep]), np.ascontiguousarray(d[mesh.f][keep]), s[keep], cam["H"], cam["W"])
     return img.astype(np.uint8)
 
 

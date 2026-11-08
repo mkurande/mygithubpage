@@ -5,8 +5,10 @@ and front silhouettes match real photographs. Built from scratch in this repo;
 nothing is carried over from the earlier ChatGPT-hosted project, which this
 environment could not reach.
 
-**Best result: `iter_07`, mean silhouette IoU 0.962 (side 0.971, top 0.974,
-front 0.943); never-fitted top hold-out photo 0.976. Baseline `iter_00`: 0.864.**
+**Current model: `iter_10`, mean silhouette IoU 0.962 (side 0.971, top 0.974,
+front 0.942); never-fitted top hold-out photo 0.976. Baseline `iter_00`: 0.864.**
+`iter_10` keeps the `iter_07` fit and adds a detail pass, exported at 1,780,399
+triangles (5× the 356,348-triangle `iter_07` export).
 Progress page: published as a private Claude artifact (see the PR description).
 
 | Iter | Mean | Side | Top | Front | Top hold-out | Change |
@@ -21,6 +23,7 @@ Progress page: published as a private Claude artifact (see the PR description).
 | **07** | **0.9623** | **0.971** | **0.974** | **0.943** | **0.976** | higher-resolution objective |
 | 08 | 0.9621 | 0.971 | 0.974 | 0.942 | 0.976 | no gain |
 | 09 | 0.9621 | 0.970 | 0.973 | 0.943 | 0.976 | no gain (plateau) |
+| **10** | **0.9623** | **0.971** | **0.974** | **0.942** | **0.976** | detail pass + adaptive sampling, refit |
 
 All rows use one registration protocol (`YF23_WORK_SCALE=0.5`). Full numbers,
 including edge distances in metres, are in `iterations/history.json` and each
@@ -38,7 +41,11 @@ including edge distances in metres, are in `iterations/history.json` and each
 - `refs/`: selected photos (`sel/`), masks (`masks/`), the hand trace for the front view
   (`front_trace.json`), Commons metadata (`meta/`).
 - `iterations/iter_NN/`: metrics, cameras, overlay panel; full-size overlays kept for 00 and 07.
-- `exports/yf23_iter07_preview.glb`: 0.36 M-triangle mesh, gear down.
+- `tools/yf23_detail.py`: detail layer (canopy frame, AoA probes, articulated gear); intake ducts,
+  exhaust troughs and engine humps live in `yf23_model.py` behind the params' `detail` block.
+- `tools/chordal.py`: fuselage tessellation error against the parametric surface.
+- `exports/yf23_iter10_5x.glb`: 1.78 M-triangle mesh, gear down (5× the iter_07 export).
+- `exports/yf23_iter10_preview.glb`, `exports/yf23_iter07_preview.glb`: lighter previews.
 - `report/`: the progress page source.
 
 ## Reproduce
@@ -49,8 +56,29 @@ cd tools
 python fetch_refs.py ../refs/raw ../refs/commons_titles.txt   # optional; selected photos are committed
 YF23_WORK_SCALE=0.5 python evaluate.py ../cad/params/iter_07.json ../iterations/iter_07 --init ../iterations/iter_07/cameras.json
 YF23_WORK_SCALE=0.5 python run_iteration.py 10              # next iteration from iter_09
-python export_mesh.py ../cad/params/iter_07.json out.glb 3.0   # ~3.2 M triangles
+python export_mesh.py ../cad/params/iter_10.json out.glb 2.057   # 1.78 M triangles (5x)
 ```
+
+## Detail pass (iteration 10)
+
+Evidence: NMUSAF walk-around photos of PAV-1 (CC BY 2.0, Commons `United States Air
+Force - Northrop-McDonnell Douglas YF-23 Black Widow II fighter plane N`).
+
+- Open intakes: lip ring, inner duct tapering aft, engine face with hub (were capped).
+- Engine humps over each engine, spine lowered between them (the fitted model had the
+  height on the centreline; side and top silhouettes cannot distinguish the two).
+- Recessed exhaust troughs between the sidewalls; canopy seated on the true fuselage
+  surface with sill rails and a windscreen bow; L-shaped AoA probes.
+- Gear: oleo struts, nose fork, torque links, drag braces, shaped tyres and hubs, doors.
+  Height with gear down 4.25 m (published 4.24 m).
+- Adaptive sampling: stations follow curvature; section points cluster at the chines.
+
+Fuselage tessellation error (normal distance, facet centre to true surface):
+uniform 0.36 M export mean 0.096 mm, p99 0.35 mm, max 1.43 mm; adaptive 5× export
+mean 0.032 mm, p99 0.16 mm, max 0.90 mm. This was already far below the cm-level photo
+fit, so the fidelity gain comes from the new geometry, not the triangle count.
+Detail placement is checked visually against museum photos; those photos are not
+registered, so there is no quantitative score for interior details yet.
 
 ## Method
 

@@ -288,5 +288,34 @@
    "top_b": 1.0052,
    "front": 1.0
   }
+ },
+ {
+  "iteration": 10,
+  "note": "iteration 10: detail layer (open intakes with lip/duct/engine face, recessed exhaust troughs, engine humps with lowered spine, canopy sill and windscreen bow, AoA probes, articulated gear) and curvature-adaptive sampling; then pattern-search refinement (iter_09 cameras fixed) and re-registration.",
+  "mean_iou_fitted": 0.962310962958237,
+  "iou": {
+   "side": 0.9711,
+   "top": 0.9737,
+   "top_b": 0.9761,
+   "front": 0.9421
+  },
+  "boundary_mean_cm": {
+   "side": 2.3,
+   "top": 4.8,
+   "top_b": 4.2,
+   "front": 11.1
+  },
+  "boundary_p95_cm": {
+   "side": 11.7,
+   "top": 17.0,
+   "top_b": 15.2,
+   "front": 57.8
+  },
+  "aspect": {
+   "side": 1.0158,
+   "top": 0.9923,
+   "top_b": 1.0052,
+   "front": 1.0
+  }
  }
 ]

@@ -115,8 +115,8 @@ code { font-family: var(--mono); font-size: .85em; }
       <p class="lede">A fresh parametric CAD model of the YF-23, fitted to real photographs so its side, top and front silhouettes match. Each iteration re-registers a camera to every photo, then reshapes the CAD to raise silhouette overlap (IoU). Overall length and span stay locked to published dimensions.</p>
     </div>
     <div class="tblock" aria-label="Result summary">
-      <div><span class="k">Best iteration</span><span class="v">iter_07</span></div>
-      <div><span class="k">Status</span><span class="pill ok">plateau reached</span></div>
+      <div><span class="k">Current model</span><span class="v">iter_10</span></div>
+      <div><span class="k">Mesh</span><span class="v num">1.78 M <small>triangles, 5× iter_07</small></span></div>
       <div><span class="k">Mean IoU (side, top, front)</span><span class="v num">0.962 <small>from 0.864</small></span></div>
       <div><span class="k">Hold-out top photo</span><span class="v num">0.976 <small>never fitted</small></span></div>
       <div><span class="k">Mean edge error</span><span class="v num">2.3 / 4.7 / 11.1 <small>cm</small></span></div>
@@ -127,7 +127,7 @@ code { font-family: var(--mono); font-size: .85em; }
   <section>
     <div class="sec-head">
       <h2>Silhouette IoU by iteration</h2>
-      <p class="lede">Every iteration scored under one registration protocol. Iterations 08 and 09 gave no further gain, so 07 is the result.</p>
+      <p class="lede">Every iteration scored under one registration protocol. Iterations 08 and 09 gave no further gain. Iteration 10 adds the detail pass and holds the same fit.</p>
     </div>
     <div class="chart-box">
       <div class="legend" aria-hidden="true">
@@ -146,6 +146,57 @@ code { font-family: var(--mono); font-size: .85em; }
           </table>
         </div>
       </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="eyebrow">Iteration 10 · detail pass</div>
+      <h2>Five times the triangles, spent on detail</h2>
+      <p class="lede">The exported mesh went from 356,348 to 1,780,399 triangles (4.996×). The added triangles go to features seen in museum walk-around photos and to curved regions. Silhouette fit is unchanged: mean IoU 0.9623, the same as iteration 07.</p>
+    </div>
+    <figure>
+      <img src="img/details_5x.jpg" alt="Close-up renders of the 5x mesh: open intake, canopy frame and probe, engine humps and exhaust troughs, nose gear" loading="lazy">
+      <figcaption>Rendered from the 1.78 M-triangle export. Gear is down; the silhouette scores use gear-up geometry.</figcaption>
+    </figure>
+    <div class="cols">
+      <div>
+        <h3>What was added</h3>
+        <ul class="plain">
+          <li>Open intakes: lip ring, inner duct tapering aft, engine face with hub. Previously capped.</li>
+          <li>Engine humps over each engine with the spine lowered between them. The earlier model had this inverted; side and top silhouettes can't tell the two apart.</li>
+          <li>Recessed exhaust troughs in the aft deck between the sidewalls.</li>
+          <li>Canopy seated on the real fuselage surface, with sill rails and a windscreen bow.</li>
+          <li>L-shaped angle-of-attack probes on the lower forebody.</li>
+          <li>Landing gear: oleo struts, nose fork, torque links, drag braces, shaped tyres and hubs, gear doors. Overall height with gear down stays 4.25 m (published 4.24 m).</li>
+          <li>Adaptive sampling: fuselage and nacelle stations follow curvature, and section points cluster at the chines.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>What the extra triangles buy</h3>
+        <div class="tbl">
+          <table>
+            <thead><tr><th>Fuselage tessellation</th><th class="n">Triangles</th><th class="n">Mean</th><th class="n">p99</th><th class="n">Max</th></tr></thead>
+            <tbody>
+              <tr><td>Iteration 07 export, uniform</td><td class="n">127,680</td><td class="n">0.096 mm</td><td class="n">0.35 mm</td><td class="n">1.43 mm</td></tr>
+              <tr><td>Iteration 10 export, adaptive</td><td class="n">540,876</td><td class="n">0.032 mm</td><td class="n">0.16 mm</td><td class="n">0.90 mm</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note">Normal distance from each facet to the true parametric surface. Tessellation error was already far below the centimetre-level fit to the photos. The real fidelity gain is the new geometry, not the triangle count.</p>
+        <div class="tbl">
+          <table>
+            <thead><tr><th>Part</th><th class="n">Triangles</th></tr></thead>
+            <tbody>
+              <tr><td>Fuselage</td><td class="n">541,205</td></tr><tr><td>Nacelles and exhaust walls</td><td class="n">422,070</td></tr>
+              <tr><td>Wing</td><td class="n">323,408</td></tr><tr><td>Intake ducts</td><td class="n">197,000</td></tr>
+              <tr><td>V-tails</td><td class="n">162,016</td></tr><tr><td>Canopy</td><td class="n">60,024</td></tr>
+              <tr><td>Landing gear</td><td class="n">42,292</td></tr><tr><td>Canopy frame</td><td class="n">31,488</td></tr>
+              <tr><td>Probes</td><td class="n">896</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -172,7 +223,7 @@ code { font-family: var(--mono); font-size: .85em; }
     </div>
     <div class="tabs" role="tablist" id="tabs"></div>
     <p class="note" id="itnote"></p>
-    <figure><img id="itimg" src="img/panel_07.jpg" alt="Overlay panel for the selected iteration"></figure>
+    <figure><img id="itimg" src="img/panel_10.jpg" alt="Overlay panel for the selected iteration"></figure>
   </section>
 
   <section>
@@ -244,7 +295,8 @@ code { font-family: var(--mono); font-size: .85em; }
 </div>
 
 <script>
-const H = [[0,0.8635,0.847,0.882,0.8615,0.8824,12.6,29.9,13.6],[1,0.9072,0.9008,0.9378,0.883,0.9378,8.0,16.9,13.9],[2,0.9465,0.961,0.9698,0.9089,0.9708,3.1,5.5,12.8],[3,0.9535,0.961,0.9701,0.9293,0.9725,3.0,5.3,12.0],[4,0.9557,0.9595,0.9713,0.9362,0.9736,3.1,5.3,11.7],[5,0.9599,0.9687,0.9723,0.9388,0.9746,2.4,4.9,11.5],[6,0.9603,0.9674,0.973,0.9405,0.9752,2.5,4.8,11.4],[7,0.9623,0.971,0.9736,0.9425,0.9756,2.3,4.7,11.1],[8,0.9621,0.9705,0.9735,0.9424,0.9758,2.3,4.8,11.2],[9,0.9621,0.9701,0.9734,0.9428,0.9762,2.3,4.9,11.1]];
+const H = [[0,0.8635,0.847,0.882,0.8615,0.8824,12.6,29.9,13.6],[1,0.9072,0.9008,0.9378,0.883,0.9378,8.0,16.9,13.9],[2,0.9465,0.961,0.9698,0.9089,0.9708,3.1,5.5,12.8],[3,0.9535,0.961,0.9701,0.9293,0.9725,3.0,5.3,12.0],[4,0.9557,0.9595,0.9713,0.9362,0.9736,3.1,5.3,11.7],[5,0.9599,0.9687,0.9723,0.9388,0.9746,2.4,4.9,11.5],[6,0.9603,0.9674,0.973,0.9405,0.9752,2.5,4.8,11.4],[7,0.9623,0.971,0.9736,0.9425,0.9756,2.3,4.7,11.1],[8,0.9621,0.9705,0.9735,0.9424,0.9758,2.3,4.8,11.2],[9,0.9621,0.9701,0.9734,0.9428,0.9762,2.3,4.9,11.1],[10,0.9623,0.9711,0.9737,0.9421,0.9761,2.3,4.8,11.1]];
+const NI = H.length - 1;
 const SER = [
   {k:2, name:"Side", c:"--s1"},
   {k:3, name:"Top", c:"--s2"},
@@ -256,7 +308,8 @@ const NOTES = {
   "01": "Iteration 01. Structural fixes: pentagon V-tails, intakes narrowing downward, W-shaped aft deck, wing carried through the fuselage. Values measured by back-projecting photo points through the registered cameras. Mean IoU 0.907.",
   "02": "Iteration 02. First constrained optimizer pass over 114 control points, cameras held fixed, then re-registered. Front trace corrected to v2 after review. Mean IoU 0.947.",
   "04": "Iteration 04. Two more passes. Gains are flattening, and remaining errors need more control points and correlated moves. Mean IoU 0.956.",
-  "07": "Iteration 07 (best). Denser control points (193), whole-curve shift moves, exhaust sidewall flare, and a higher-resolution objective. Mean IoU 0.962; top hold-out 0.976. Iterations 08 and 09 gave no gain."
+  "07": "Iteration 07 (best silhouette fit). Denser control points (193), whole-curve shift moves, exhaust sidewall flare, and a higher-resolution objective. Mean IoU 0.962; top hold-out 0.976. Iterations 08 and 09 gave no gain.",
+  "10": "Iteration 10 (current). Detail pass: open intakes, engine humps, exhaust troughs, canopy frame, probes, articulated gear, adaptive sampling, then one refinement pass. Mean IoU 0.9623, the same as 07."
 };
 
 function css(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
@@ -266,7 +319,7 @@ function drawChart(){
   const tip = document.getElementById("tip");
   box.querySelectorAll("svg").forEach(s => s.remove());
   const W = 760, Hh = 320, m = {l:48, r:112, t:14, b:34};
-  const x = i => m.l + (W - m.l - m.r) * i / 9;
+  const x = i => m.l + (W - m.l - m.r) * i / NI;
   const y0 = 0.84, y1 = 0.98;
   const y = v => m.t + (Hh - m.t - m.b) * (1 - (v - y0) / (y1 - y0));
   const ns = "http://www.w3.org/2000/svg";
@@ -280,12 +333,14 @@ function drawChart(){
     el("line", {x1:m.l, x2:W - m.r, y1:y(v), y2:y(v), stroke:rule, "stroke-width":1});
     const t = el("text", {x:m.l - 8, y:y(v) + 4, "text-anchor":"end"}); t.textContent = v.toFixed(2);
   }
-  for (let i = 0; i <= 9; i++) {
+  for (let i = 0; i <= NI; i++) {
     const t = el("text", {x:x(i), y:Hh - m.b + 18, "text-anchor":"middle"}); t.textContent = String(i).padStart(2, "0");
   }
   const xl = el("text", {x:(m.l + W - m.r) / 2, y:Hh - 2, "text-anchor":"middle"}); xl.textContent = "iteration";
   el("line", {x1:x(7), x2:x(7), y1:m.t, y2:Hh - m.b, stroke:ink3, "stroke-width":1, "stroke-dasharray":"2 4"});
-  const bl = el("text", {x:x(7) + 4, y:m.t + 10}); bl.textContent = "best";
+  const bl = el("text", {x:x(7) + 4, y:m.t + 10}); bl.textContent = "best fit";
+  el("line", {x1:x(10), x2:x(10), y1:m.t, y2:Hh - m.b, stroke:ink3, "stroke-width":1, "stroke-dasharray":"2 4"});
+  const dl = el("text", {x:x(10) - 4, y:m.t + 10, "text-anchor":"end"}); dl.textContent = "detail pass";
   const ends = [];
   SER.forEach(s => {
     const col = css(s.c);
@@ -306,7 +361,7 @@ function drawChart(){
   function show(ev){
     const r = svg.getBoundingClientRect();
     const px = (ev.clientX - r.left) * W / r.width;
-    const i = Math.max(0, Math.min(9, Math.round((px - m.l) / ((W - m.l - m.r) / 9))));
+    const i = Math.max(0, Math.min(NI, Math.round((px - m.l) / ((W - m.l - m.r) / NI))));
     const row = H[i];
     cross.setAttribute("x1", x(i)); cross.setAttribute("x2", x(i)); cross.setAttribute("opacity", .35);
     dots.forEach((dt, j) => { dt.setAttribute("cx", x(i)); dt.setAttribute("cy", y(row[SER[j].k])); dt.setAttribute("opacity", 1); });
@@ -327,7 +382,7 @@ function drawChart(){
 
 function fillTable(){
   document.getElementById("tbody").innerHTML = H.map(r =>
-    `<tr class="${r[0] === 7 ? "best" : ""}"><td class="num">${String(r[0]).padStart(2, "0")}${r[0] === 7 ? " (best)" : ""}</td><td class="n">${r[1].toFixed(4)}</td><td class="n">${r[2].toFixed(4)}</td><td class="n">${r[3].toFixed(4)}</td><td class="n">${r[4].toFixed(4)}</td><td class="n">${r[5].toFixed(4)}</td><td class="n">${r[6]} / ${r[7]} / ${r[8]}</td></tr>`).join("");
+    `<tr class="${r[0] === 10 ? "best" : ""}"><td class="num">${String(r[0]).padStart(2, "0")}${r[0] === 7 ? " (best fit)" : r[0] === 10 ? " (current)" : ""}</td><td class="n">${r[1].toFixed(4)}</td><td class="n">${r[2].toFixed(4)}</td><td class="n">${r[3].toFixed(4)}</td><td class="n">${r[4].toFixed(4)}</td><td class="n">${r[5].toFixed(4)}</td><td class="n">${r[6]} / ${r[7]} / ${r[8]}</td></tr>`).join("");
 }
 
 function tabs(){
@@ -343,7 +398,7 @@ function tabs(){
     keys.forEach(j => document.getElementById("tab-" + j).setAttribute("aria-selected", j === k ? "true" : "false"));
     img.src = "img/panel_" + k + ".jpg"; img.alt = "Overlay panel for iteration " + k; note.textContent = NOTES[k];
   }
-  select("07");
+  select("10");
 }
 
 drawChart(); fillTable(); tabs();

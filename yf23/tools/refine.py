@@ -34,7 +34,7 @@ TABLE_STEPS = {
     "fus_exp_upper": 0.25, "fus_exp_lower": 0.25,
     "can_halfwidth": 0.04, "can_top": 0.04,
     "nac_y": 0.06, "nac_halfwidth": 0.05, "nac_top": 0.04, "nac_bottom": 0.04,
-    "nac_bottom_ratio": 0.06, "nac_bottom_shift": 0.05, "nac_exp": 0.5,
+    "nac_bottom_ratio": 0.06, "nac_bottom_shift": 0.05, "nac_exp": 0.5, "nac_exp_top": 0.4,
 }
 SCALAR_STEPS = {
     ("wing", "le_sweep_deg"): 0.5, ("wing", "te_sweep_deg"): 0.5, ("wing", "x_le_c"): 0.08, ("wing", "x_te_c"): 0.08,
