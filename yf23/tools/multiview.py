@@ -128,10 +128,10 @@ def banded_iou(cad, sam, band):
     return float(P.iou(cad & band, sam & band))
 
 
-def score_views(workdir, params, al, mask_dir, names=None, frac=0.035, band_params=None):
+def score_views(workdir, params, al, mask_dir, names=None, frac=0.035, band_params=None, cams_json=None):
     """Banded IoU per view. The band comes from `band_params` (default: the scored params) so
     different revisions can be compared on an identical evaluation region."""
-    r, views = load_views(workdir)
+    r, views = load_views_refined(workdir, cams_json)
     mesh = M.build(M.load_params(params), 0.5, gear_down=True)
     bmesh = M.build(M.load_params(band_params), 0.5, gear_down=True) if band_params else mesh
     out = {}
@@ -160,8 +160,8 @@ def gear_zone(mesh, view, al):
     return cv2.dilate(sil.astype(np.uint8), np.ones((k, k), np.uint8)) > 0
 
 
-def prepare_terms(workdir, p, al, mask_dir, names, scale=0.35, frac=0.035):
-    r, views = load_views(workdir)
+def prepare_terms(workdir, p, al, mask_dir, names, scale=0.35, frac=0.035, cams_json=None):
+    r, views = load_views_refined(workdir, cams_json)
     mesh = M.build(p, 0.5, gear_down=True)
     terms = []
     for v in views:
@@ -175,3 +175,62 @@ def prepare_terms(workdir, p, al, mask_dir, names, scale=0.35, frac=0.035):
         bd = cv2.resize(band.astype(np.uint8), (W, H), interpolation=cv2.INTER_NEAREST) > 0
         terms.append((v, al, sm, bd, scale))
     return terms
+
+
+def _rotvec(rx, ry, rz):
+    import math
+    th = math.sqrt(rx * rx + ry * ry + rz * rz)
+    if th < 1e-12:
+        return np.eye(3)
+    k = np.array([rx, ry, rz]) / th
+    K = np.array([[0, -k[2], k[1]], [k[2], 0, -k[0]], [-k[1], k[0], 0]])
+    return np.eye(3) + math.sin(th) * K + (1 - math.cos(th)) * K @ K
+
+
+def perturbed(v, z, depth):
+    """Copy of view v with a small pose/focal correction z = (rx, ry, rz [deg], tx, ty, tz [fraction of depth], log f)."""
+    import copy
+    w = copy.copy(v)
+    dR = _rotvec(*np.radians(z[:3]))
+    w.Rc = dR @ v.Rc
+    w.tc = dR @ v.tc + np.asarray(z[3:6]) * depth
+    w.f = v.f * float(np.exp(z[6]))
+    return w
+
+
+def refine_cameras(workdir, params, al, mask_dir, names, scale=0.3, frac=0.06, rot_lim=3.0, t_lim=0.10, f_lim=0.15):
+    """Per-view bounded camera correction maximising banded IoU against the SAM mask (CAD fixed)."""
+    from scipy.optimize import minimize
+    r, views = load_views(workdir)
+    mesh = M.build(M.load_params(params), 0.3, gear_down=True)
+    out = {}
+    for v in views:
+        if v.name not in names:
+            continue
+        sam = cv2.imread(os.path.join(mask_dir, v.name[:-4] + ".png"), 0) > 127
+        W, H = int(v.W * scale), int(v.H * scale)
+        sm = cv2.resize(sam.astype(np.uint8), (W, H), interpolation=cv2.INTER_NEAREST) > 0
+        g = gear_zone(mesh, v, al)
+        gz = cv2.resize(g.astype(np.uint8), (W, H), interpolation=cv2.INTER_NEAREST) > 0
+        # depth of the aircraft centre in this camera (sets the translation scale)
+        s, R, t = al["s"], np.array(al["R"]), np.array(al["t"])
+        c = s * (np.array([10.3, 0, 2.2]) @ R.T) + t
+        depth = float((v.Rc @ c + v.tc)[2])
+        def cost(z):
+            w = perturbed(v, z, depth)
+            cad = silhouette(mesh, w, al, scale)
+            band = band_of(cad, frac) & ~gz
+            pen = sum(max(0, abs(a) - rot_lim) for a in z[:3]) + sum(max(0, abs(a) - t_lim) * 20 for a in z[3:6]) + max(0, abs(z[6]) - np.log(1 + f_lim)) * 20
+            return -banded_iou(cad, sm, band) + pen
+        z0 = np.zeros(7)
+        c0 = cost(z0)
+        res = minimize(cost, z0, method="Powell", options=dict(xtol=1e-3, ftol=1e-5, maxfev=600))
+        out[v.name] = dict(z=[float(a) for a in res.x], depth=depth, before=-c0, after=-float(res.fun))
+        print(f"{v.name:34s} banded {-c0:.3f} -> {-res.fun:.3f}  rot {np.round(res.x[:3],2)} t {np.round(res.x[3:6],3)} f x{np.exp(res.x[6]):.3f}", flush=True)
+    return out
+
+
+def load_views_refined(workdir, cams_json):
+    r, views = load_views(workdir)
+    C = json.load(open(cams_json)) if cams_json and os.path.exists(cams_json) else {}
+    return r, [perturbed(v, C[v.name]["z"], C[v.name]["depth"]) if v.name in C else v for v in views]

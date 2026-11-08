@@ -26,14 +26,14 @@ def point_metrics(p, al, Ps, seed=0):
     return out, fit, hold
 
 
-def mv_metrics(params, al, names, band_params):
+def mv_metrics(params, al, names, band_params, cams_json=None):
     import multiview as MV
-    sc = MV.score_views(SFM, params, al, os.path.join(SFM, "masks"), names=set(names), band_params=band_params)
+    sc = MV.score_views(SFM, params, al, os.path.join(SFM, "masks"), names=set(names), band_params=band_params, cams_json=cams_json)
     v = np.array(list(sc.values()))
     return dict(n=int(len(v)), mean=round(float(v.mean()), 4), median=round(float(np.median(v)), 4)), sc
 
 
-def run(n, w=0.3, sweeps=3, from_params=None, w_mv=0.0):
+def run(n, w=0.3, sweeps=3, from_params=None, w_mv=0.0, mv_cams=None):
     prev, cur = f"iter_{n - 1:02d}", f"iter_{n:02d}"
     p = M.load_params(from_params or os.path.join(ROOT, "cad", "params", prev + ".json"))
     cams = json.load(open(os.path.join(ROOT, "iterations", prev, "cameras.json")))
@@ -48,13 +48,14 @@ def run(n, w=0.3, sweeps=3, from_params=None, w_mv=0.0):
         import multiview as MV
         sel = json.load(open(os.path.join(SFM, "mv_selection.json")))
         bp = from_params or os.path.join(ROOT, "cad", "params", prev + ".json")
-        mv_terms = MV.prepare_terms(SFM, p, al, os.path.join(SFM, "masks"), set(sel["fit"]), scale=0.3)
-        mvb = {k: mv_metrics(bp, al, sel[k], bp)[0] for k in ("fit", "holdout")}
+        mv_terms = MV.prepare_terms(SFM, p, al, os.path.join(SFM, "masks"), set(sel["fit"]), scale=0.3, cams_json=mv_cams)
+        mvb = {k: mv_metrics(bp, al, sel[k], bp, mv_cams)[0] for k in ("fit", "holdout")}
         print(f"[{cur}] before: multiview banded IoU {mvb}", flush=True)
     p2, f = R.refine(p, cams, sweeps=sweeps, log=lambda s: print(s, flush=True), points=fit, w_points=w, mv=mv_terms, w_mv=w_mv)
     p2["_note"] = (f"iteration {n}: refinement with silhouette IoU (side/top/front) plus SfM point-to-surface term "
                    f"(w={w}, {len(fit)} fit points from {os.path.relpath(SFM, ROOT)})"
-                   + (f" plus banded multi-view silhouettes from {len(mv_terms)} SfM-posed museum photos (w={w_mv})" if w_mv else "")
+                   + (f" plus banded multi-view silhouettes from {len(mv_terms)} SfM-posed museum photos (w={w_mv}"
+                      + (f", per-view cameras refined: {os.path.basename(mv_cams)}" if mv_cams else "") + ")" if w_mv else "")
                    + f", cameras from {prev}; then re-registered.")
     pp = os.path.join(ROOT, "cad", "params", cur + ".json")
     json.dump(p2, open(pp, "w"), indent=1)
@@ -65,7 +66,7 @@ def run(n, w=0.3, sweeps=3, from_params=None, w_mv=0.0):
     mva = None
     if w_mv:
         bp = from_params or os.path.join(ROOT, "cad", "params", prev + ".json")
-        mva = {k: mv_metrics(pp, al2, sel[k], bp)[0] for k in ("fit", "holdout")}
+        mva = {k: mv_metrics(pp, al2, sel[k], bp, mv_cams)[0] for k in ("fit", "holdout")}
         print(f"[{cur}] after: multiview banded IoU {mva}", flush=True)
     out = os.path.join(ROOT, "iterations", cur)
     s = E.evaluate(pp, out, os.path.join(ROOT, "iterations", prev, "cameras.json"))
@@ -93,5 +94,6 @@ if __name__ == "__main__":
     ap.add_argument("--sweeps", type=int, default=3)
     ap.add_argument("--from-params")
     ap.add_argument("--w-mv", type=float, default=0.0)
+    ap.add_argument("--mv-cams")
     a = ap.parse_args()
-    run(a.n, a.w, a.sweeps, a.from_params, a.w_mv)
+    run(a.n, a.w, a.sweeps, a.from_params, a.w_mv, a.mv_cams)

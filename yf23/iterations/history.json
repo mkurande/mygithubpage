@@ -378,5 +378,90 @@
     "median_signed_cm": 1.33
    }
   }
+ },
+ {
+  "iteration": 12,
+  "note": "iteration 12: refinement with silhouette IoU (side/top/front) plus SfM point-to-surface term (w=0.3, 1221 fit points from sfm/nmusaf) plus banded multi-view silhouettes from 69 SfM-posed museum photos (w=1.5), cameras from iter_11; then re-registered.",
+  "mean_iou_fitted": 0.9608150612115202,
+  "iou": {
+   "side": 0.9684,
+   "top": 0.9739,
+   "top_b": 0.9769,
+   "front": 0.9402
+  },
+  "boundary_mean_cm": {
+   "side": 2.5,
+   "top": 5.2,
+   "top_b": 4.4,
+   "front": 11.0
+  },
+  "boundary_p95_cm": {
+   "side": 11.0,
+   "top": 18.0,
+   "top_b": 15.8,
+   "front": 56.1
+  },
+  "aspect": {
+   "side": 1.0157,
+   "top": 0.9923,
+   "top_b": 1.0047,
+   "front": 1.0
+  },
+  "sfm_points_after": {
+   "fit": {
+    "n": 1224,
+    "median_abs_cm": 3.79,
+    "mean_abs_cm": 7.78,
+    "p90_abs_cm": 22.88,
+    "median_signed_cm": 0.89
+   },
+   "holdout": {
+    "n": 306,
+    "median_abs_cm": 2.91,
+    "mean_abs_cm": 5.8,
+    "p90_abs_cm": 17.97,
+    "median_signed_cm": 0.77
+   }
+  },
+  "sfm_points_before": {
+   "fit": {
+    "n": 1221,
+    "median_abs_cm": 3.57,
+    "mean_abs_cm": 7.58,
+    "p90_abs_cm": 24.01,
+    "median_signed_cm": 0.87
+   },
+   "holdout": {
+    "n": 305,
+    "median_abs_cm": 3.91,
+    "mean_abs_cm": 7.25,
+    "p90_abs_cm": 21.21,
+    "median_signed_cm": 1.02
+   }
+  },
+  "multiview_before": {
+   "fit": {
+    "n": 69,
+    "mean": 0.7653,
+    "median": 0.7601
+   },
+   "holdout": {
+    "n": 23,
+    "mean": 0.765,
+    "median": 0.7643
+   }
+  },
+  "multiview_after": {
+   "fit": {
+    "n": 69,
+    "mean": 0.7887,
+    "median": 0.7823
+   },
+   "holdout": {
+    "n": 23,
+    "mean": 0.7877,
+    "median": 0.7821
+   }
+  }
  }
 ]
