@@ -5,3 +5,10 @@ __pycache__/
 *.pyc
 exports/*detailed*
 exports/*.stl
+sfm/*/database.db
+sfm/*/images/
+models/
+sfm/*/masks/
+iterations/*/sfm_projection_check.jpg
+sfm/*/mask_*.png
+sfm/*/*log*.txt

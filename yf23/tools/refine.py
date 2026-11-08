@@ -105,7 +105,9 @@ def smooth_pen(p):
 
 
 class Objective:
-    def __init__(self, cams, names=("side", "top", "front")):
+    def __init__(self, cams, names=("side", "top", "front"), points=None, w_points=0.0, mv=None, w_mv=0.0):
+        self.points, self.w_points = points, w_points
+        self.mv, self.w_mv = mv or [], w_mv  # list of (view, align, sam_mask_small, band_small, scale)
         self.items = []
         for n in names:
             ref, valid = E.load_ref(n)
@@ -120,10 +122,22 @@ class Objective:
         self.evals = 0
 
     def ious(self, p):
-        mesh = M.build(p, density=0.22, gear_down=False)
+        full = M.build(p, density=0.22, gear_down=bool(self.mv))
+        if self.mv:
+            keep = full.part != M.PARTS.index("gear")
+            mesh = M.Mesh(full.v, full.f[keep], full.part[keep])
+        else:
+            mesh = full
         out = {}
         for n, c, r, v, w in self.items:
             out[n] = P.iou(P.silhouette(mesh, c) & v, r)
+        if self.mv:
+            import multiview as MV
+            vals = []
+            for view, al, sm, band, sc in self.mv:
+                cad = MV.silhouette(full, view, al, sc)
+                vals.append(P.iou(cad & band, sm & band))
+            out["multiview"] = float(np.mean(vals))
         return out, mesh
 
     def __call__(self, p):
@@ -134,14 +148,19 @@ class Objective:
             return -1e9
         wsum = sum(w for *_, w in self.items)
         score = sum(d[n] * w for n, _, _, _, w in self.items) / wsum
+        if self.mv and self.w_mv:
+            score = (score * wsum + self.w_mv * d["multiview"]) / (wsum + self.w_mv)
         xmax = mesh.v[:, 0].max()
         pen = max(0.0, abs(xmax - L_TOTAL) - 0.02) * 0.5 + smooth_pen(p)
+        if self.points is not None and self.w_points:
+            import points_term as PT
+            pen += self.w_points * PT.point_cost(mesh, self.points)[0]
         return score - pen
 
 
-def refine(p, cams, sweeps=3, groups=None, log=print, time_budget=None):
+def refine(p, cams, sweeps=3, groups=None, log=print, time_budget=None, points=None, w_points=0.0, mv=None, w_mv=0.0):
     groups = groups or list(GROUPS)
-    obj = Objective(cams)
+    obj = Objective(cams, points=points, w_points=w_points, mv=mv, w_mv=w_mv)
     cs = coords(p, groups)
     steps = {i: st for i, (_, st) in enumerate(cs)}
     best = obj(p)

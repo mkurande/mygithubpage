@@ -317,5 +317,66 @@
    "top_b": 1.0052,
    "front": 1.0
   }
+ },
+ {
+  "iteration": 11,
+  "note": "iteration 11: refinement with silhouette IoU (side/top/front) plus SfM point-to-surface term (w=0.3, 1228 fit points from sfm/nmusaf), cameras from iter_10; then re-registered.",
+  "mean_iou_fitted": 0.9629160358505676,
+  "iou": {
+   "side": 0.9721,
+   "top": 0.9737,
+   "top_b": 0.9764,
+   "front": 0.943
+  },
+  "boundary_mean_cm": {
+   "side": 2.2,
+   "top": 4.7,
+   "top_b": 4.1,
+   "front": 11.1
+  },
+  "boundary_p95_cm": {
+   "side": 11.6,
+   "top": 17.0,
+   "top_b": 14.9,
+   "front": 58.0
+  },
+  "aspect": {
+   "side": 1.0158,
+   "top": 0.9923,
+   "top_b": 1.0047,
+   "front": 1.0
+  },
+  "sfm_points_after": {
+   "fit": {
+    "n": 1222,
+    "median_abs_cm": 3.59,
+    "mean_abs_cm": 7.59,
+    "p90_abs_cm": 23.5,
+    "median_signed_cm": 1.0
+   },
+   "holdout": {
+    "n": 305,
+    "median_abs_cm": 3.92,
+    "mean_abs_cm": 7.6,
+    "p90_abs_cm": 23.26,
+    "median_signed_cm": 0.86
+   }
+  },
+  "sfm_points_before": {
+   "fit": {
+    "n": 1228,
+    "median_abs_cm": 4.47,
+    "mean_abs_cm": 8.26,
+    "p90_abs_cm": 23.68,
+    "median_signed_cm": 1.22
+   },
+   "holdout": {
+    "n": 306,
+    "median_abs_cm": 3.92,
+    "mean_abs_cm": 8.15,
+    "p90_abs_cm": 24.52,
+    "median_signed_cm": 1.33
+   }
+  }
  }
 ]
