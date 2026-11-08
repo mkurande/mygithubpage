@@ -1,0 +1,154 @@
+{
+ "params": "../cad/params/iter_11.json",
+ "mean_iou_fitted": 0.9629160358505676,
+ "results": {
+  "side": {
+   "iou": 0.9720584551148226,
+   "missing_frac": 0.014419128417451972,
+   "excess_frac": 0.013911114497870575,
+   "boundary_mean_m": 0.021858958527445793,
+   "boundary_p95_m": 0.1164969727396965,
+   "hausdorff_m": 0.240393728017807,
+   "px_per_m_at_cg": 84.01591515976108,
+   "fit_weight": 1.0,
+   "seconds": 3.6,
+   "cam": {
+    "kind": "persp",
+    "view": "side",
+    "dist": 119.7759,
+    "free_aspect": true,
+    "yaw": -2.2579,
+    "pitch": -0.7439,
+    "roll": 0.2056,
+    "tx": 0.0671,
+    "ty": -1.1833,
+    "f": 10063.0804,
+    "asp": 1.0158,
+    "W": 1920,
+    "H": 1346,
+    "cx": 960.0,
+    "cy": 673.0
+   }
+  },
+  "top": {
+   "iou": 0.9737223230821161,
+   "missing_frac": 0.02152199871195748,
+   "excess_frac": 0.004884018876011011,
+   "boundary_mean_m": 0.047246236354112625,
+   "boundary_p95_m": 0.17006798088550568,
+   "hausdorff_m": 0.4820544123649597,
+   "px_per_m_at_cg": 83.38663929038707,
+   "fit_weight": 1.0,
+   "seconds": 4.6,
+   "cam": {
+    "kind": "persp",
+    "view": "top",
+    "dist": 120.401,
+    "yaw": 92.1471,
+    "free_aspect": true,
+    "pitch": -10.8966,
+    "roll": -3.5237,
+    "tx": 0.3551,
+    "ty": -0.4322,
+    "f": 10039.8337,
+    "asp": 0.9923,
+    "W": 1920,
+    "H": 1440,
+    "cx": 960.0,
+    "cy": 720.0
+   }
+  },
+  "top_b": {
+   "iou": 0.9764367610583221,
+   "missing_frac": 0.017931699661604353,
+   "excess_frac": 0.005767438819048242,
+   "boundary_mean_m": 0.04113750532269478,
+   "boundary_p95_m": 0.14943332970142365,
+   "hausdorff_m": 0.44524624943733215,
+   "px_per_m_at_cg": 69.55475980685983,
+   "fit_weight": 0.0,
+   "seconds": 9.7,
+   "cam": {
+    "kind": "persp",
+    "view": "top",
+    "dist": 121.2077,
+    "yaw": -89.329,
+    "free_aspect": true,
+    "pitch": -10.2455,
+    "roll": -5.3996,
+    "tx": -0.3148,
+    "ty": -0.7538,
+    "f": 8430.5741,
+    "asp": 1.0047,
+    "W": 1800,
+    "H": 1435,
+    "cx": 900.0,
+    "cy": 717.5
+   }
+  },
+  "front": {
+   "iou": 0.9429673293547639,
+   "missing_frac": 0.02219696835476678,
+   "excess_frac": 0.03694263969283648,
+   "boundary_mean_m": 0.11081274598836899,
+   "boundary_p95_m": 0.5797430872917175,
+   "hausdorff_m": 1.1206982135772705,
+   "px_per_m_at_cg": 160.64854453618233,
+   "fit_weight": 1.0,
+   "seconds": 16.0,
+   "cam": {
+    "kind": "persp",
+    "view": "front",
+    "dist": 16.1881,
+    "yaw": -0.2163,
+    "pitch": 7.5348,
+    "roll": -0.7702,
+    "tx": 0.0448,
+    "ty": 0.2741,
+    "f": 2600.5966,
+    "asp": 1.0,
+    "W": 1920,
+    "H": 1285,
+    "cx": 960.0,
+    "cy": 642.5
+   }
+  }
+ },
+ "triangles_eval": 66698,
+ "sfm_points": {
+  "before": {
+   "fit": {
+    "n": 1228,
+    "median_abs_cm": 4.47,
+    "mean_abs_cm": 8.26,
+    "p90_abs_cm": 23.68,
+    "median_signed_cm": 1.22
+   },
+   "holdout": {
+    "n": 306,
+    "median_abs_cm": 3.92,
+    "mean_abs_cm": 8.15,
+    "p90_abs_cm": 24.52,
+    "median_signed_cm": 1.33
+   }
+  },
+  "after": {
+   "fit": {
+    "n": 1222,
+    "median_abs_cm": 3.59,
+    "mean_abs_cm": 7.59,
+    "p90_abs_cm": 23.5,
+    "median_signed_cm": 1.0
+   },
+   "holdout": {
+    "n": 305,
+    "median_abs_cm": 3.92,
+    "mean_abs_cm": 7.6,
+    "p90_abs_cm": 23.26,
+    "median_signed_cm": 0.86
+   }
+  },
+  "icp_inliers": 1205,
+  "scale_sfm_per_m": 0.27745600483070765
+ }
+}

@@ -1,0 +1,182 @@
+{
+ "params": "../cad/params/iter_12.json",
+ "mean_iou_fitted": 0.9608150612115202,
+ "results": {
+  "side": {
+   "iou": 0.96841584076025,
+   "missing_frac": 0.014660435029253134,
+   "excess_frac": 0.01747567883360004,
+   "boundary_mean_m": 0.02503117546439171,
+   "boundary_p95_m": 0.11032865941524506,
+   "hausdorff_m": 0.2446870505809784,
+   "px_per_m_at_cg": 83.35911590778892,
+   "fit_weight": 1.0,
+   "seconds": 10.3,
+   "cam": {
+    "kind": "persp",
+    "view": "side",
+    "dist": 119.7456,
+    "free_aspect": true,
+    "yaw": -2.2138,
+    "pitch": -0.8271,
+    "roll": -0.0915,
+    "tx": 0.1402,
+    "ty": -1.1862,
+    "f": 9981.8879,
+    "asp": 1.0157,
+    "W": 1920,
+    "H": 1346,
+    "cx": 960.0,
+    "cy": 673.0
+   }
+  },
+  "top": {
+   "iou": 0.9738584443654072,
+   "missing_frac": 0.02102809628690803,
+   "excess_frac": 0.005250721372567445,
+   "boundary_mean_m": 0.05166421830654144,
+   "boundary_p95_m": 0.179935023188591,
+   "hausdorff_m": 0.7842563390731812,
+   "px_per_m_at_cg": 83.36342538355868,
+   "fit_weight": 1.0,
+   "seconds": 6.2,
+   "cam": {
+    "kind": "persp",
+    "view": "top",
+    "dist": 120.4008,
+    "yaw": 92.1441,
+    "free_aspect": true,
+    "pitch": -10.8979,
+    "roll": -3.5258,
+    "tx": 0.3551,
+    "ty": -0.4322,
+    "f": 10037.0198,
+    "asp": 0.9923,
+    "W": 1920,
+    "H": 1440,
+    "cx": 960.0,
+    "cy": 720.0
+   }
+  },
+  "top_b": {
+   "iou": 0.9769246639991293,
+   "missing_frac": 0.01694430367330925,
+   "excess_frac": 0.006275849667326021,
+   "boundary_mean_m": 0.04364971071481705,
+   "boundary_p95_m": 0.1579260379076004,
+   "hausdorff_m": 0.6985968947410583,
+   "px_per_m_at_cg": 69.55470260793012,
+   "fit_weight": 0.0,
+   "seconds": 5.6,
+   "cam": {
+    "kind": "persp",
+    "view": "top",
+    "dist": 121.2075,
+    "yaw": -89.3294,
+    "free_aspect": true,
+    "pitch": -10.2454,
+    "roll": -5.3996,
+    "tx": -0.3148,
+    "ty": -0.7538,
+    "f": 8430.5529,
+    "asp": 1.0047,
+    "W": 1800,
+    "H": 1435,
+    "cx": 900.0,
+    "cy": 717.5
+   }
+  },
+  "front": {
+   "iou": 0.9401708985089032,
+   "missing_frac": 0.023652299803340427,
+   "excess_frac": 0.03847896350028727,
+   "boundary_mean_m": 0.11012379080057144,
+   "boundary_p95_m": 0.5612720251083374,
+   "hausdorff_m": 1.1099672317504883,
+   "px_per_m_at_cg": 160.76578291219303,
+   "fit_weight": 1.0,
+   "seconds": 9.1,
+   "cam": {
+    "kind": "persp",
+    "view": "front",
+    "dist": 16.1881,
+    "yaw": -0.2294,
+    "pitch": 7.3925,
+    "roll": -0.7885,
+    "tx": 0.0441,
+    "ty": 0.2741,
+    "f": 2602.4936,
+    "asp": 1.0,
+    "W": 1920,
+    "H": 1285,
+    "cx": 960.0,
+    "cy": 642.5
+   }
+  }
+ },
+ "triangles_eval": 66546,
+ "sfm_points": {
+  "before": {
+   "fit": {
+    "n": 1221,
+    "median_abs_cm": 3.57,
+    "mean_abs_cm": 7.58,
+    "p90_abs_cm": 24.01,
+    "median_signed_cm": 0.87
+   },
+   "holdout": {
+    "n": 305,
+    "median_abs_cm": 3.91,
+    "mean_abs_cm": 7.25,
+    "p90_abs_cm": 21.21,
+    "median_signed_cm": 1.02
+   }
+  },
+  "after": {
+   "fit": {
+    "n": 1224,
+    "median_abs_cm": 3.79,
+    "mean_abs_cm": 7.78,
+    "p90_abs_cm": 22.88,
+    "median_signed_cm": 0.89
+   },
+   "holdout": {
+    "n": 306,
+    "median_abs_cm": 2.91,
+    "mean_abs_cm": 5.8,
+    "p90_abs_cm": 17.97,
+    "median_signed_cm": 0.77
+   }
+  },
+  "icp_inliers": 1233,
+  "scale_sfm_per_m": 0.2772898036594221
+ },
+ "multiview": {
+  "before": {
+   "fit": {
+    "n": 69,
+    "mean": 0.7653,
+    "median": 0.7601
+   },
+   "holdout": {
+    "n": 23,
+    "mean": 0.765,
+    "median": 0.7643
+   }
+  },
+  "after": {
+   "fit": {
+    "n": 69,
+    "mean": 0.7887,
+    "median": 0.7823
+   },
+   "holdout": {
+    "n": 23,
+    "mean": 0.7877,
+    "median": 0.7821
+   }
+  },
+  "w_mv": 1.5,
+  "band_from": "iter_11.json"
+ }
+}
