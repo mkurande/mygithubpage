@@ -143,9 +143,21 @@ def score_views(workdir, params, al, mask_dir, names=None, frac=0.035, band_para
             continue
         sam = cv2.imread(mp, 0) > 127
         cad = silhouette(mesh, v, al)
-        band = band_of(silhouette(bmesh, v, al), frac)
+        band = band_of(silhouette(bmesh, v, al), frac) & ~gear_zone(bmesh, v, al)
         out[v.name] = banded_iou(cad, sam, band)
     return out
+
+
+def gear_zone(mesh, view, al):
+    """Dilated projection of the landing gear: excluded from comparisons (SAM drops thin struts)."""
+    g = mesh.part == M.PARTS.index("gear")
+    gm = M.Mesh(mesh.v, mesh.f[g], mesh.part[g])
+    sil = silhouette(gm, view, al)
+    ys, xs = np.nonzero(sil)
+    if len(xs) == 0:
+        return sil
+    k = max(5, int(0.02 * max(view.W, view.H))) | 1
+    return cv2.dilate(sil.astype(np.uint8), np.ones((k, k), np.uint8)) > 0
 
 
 def prepare_terms(workdir, p, al, mask_dir, names, scale=0.35, frac=0.035):
@@ -157,7 +169,7 @@ def prepare_terms(workdir, p, al, mask_dir, names, scale=0.35, frac=0.035):
             continue
         sam = cv2.imread(os.path.join(mask_dir, v.name[:-4] + ".png"), 0) > 127
         cad = silhouette(mesh, v, al)
-        band = band_of(cad, frac)
+        band = band_of(cad, frac) & ~gear_zone(mesh, v, al)
         W, H = int(v.W * scale), int(v.H * scale)
         sm = cv2.resize(sam.astype(np.uint8), (W, H), interpolation=cv2.INTER_NEAREST) > 0
         bd = cv2.resize(band.astype(np.uint8), (W, H), interpolation=cv2.INTER_NEAREST) > 0
